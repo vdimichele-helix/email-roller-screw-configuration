@@ -67,20 +67,16 @@ export default function PartNumberBuilder() {
     const partNumber = buildPartNumberString(config);
     toast.loading("Submitting quote request...", { id: "quote" });
     try {
-      let drawingUrl = null;
-      if (drawingFile) {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file: drawingFile });
-        drawingUrl = file_url;
-      }
-      const res = await base44.functions.invoke('submitQuote', {
-        companyName: accountName,
-        yourName,
-        yourEmail,
-        partNumber,
-        drawingUrl,
-        config,
-      });
-      if (res.data?.success) {
+      const form = new FormData();
+      form.append('companyName', accountName);
+      form.append('yourName', yourName);
+      form.append('yourEmail', yourEmail);
+      form.append('partNumber', partNumber);
+      form.append('config', JSON.stringify(config));
+      if (drawingFile) form.append('drawing', drawingFile);
+      const res = await fetch('/api/submit-quote', { method: 'POST', body: form });
+      const result = await res.json();
+      if (res.ok && result.success) {
         toast.success("Thank you for your request. Our Helix Application Engineers will review your design and contact you shortly.", { id: "quote" });
       } else {
         toast.error("There is an error. Please reach out to our Application Engineers at sales@helixlinear.com.", { id: "quote" });
