@@ -38,7 +38,7 @@ async function sendEmail(key, to, subject, html, attachments = [], replyTo = SAL
     body: JSON.stringify({ api_key: key, to: Array.isArray(to) ? to : [to], sender: `Roller Screw Configurator <${SALES_EMAIL}>`, subject, html_body: html, custom_headers: [{ header: 'Reply-To', value: replyTo }], ...(attachments.length ? { attachments } : {}) }),
   });
   const result = await response.json();
-  if (!response.ok || result?.data?.succeeded !== 1) throw new Error('SMTP2GO send failed');
+  if (!response.ok || result?.data?.succeeded !== (Array.isArray(to) ? to.length : 1)) throw new Error('SMTP2GO send failed');
 }
 
 export default async function handler(request, response) {

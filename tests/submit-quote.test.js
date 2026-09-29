@@ -9,7 +9,7 @@ test('submits sales email and customer confirmation with attached PDF', async ()
   const previousFetch = globalThis.fetch;
   globalThis.fetch = async (_url, options) => {
     calls.push(JSON.parse(options.body));
-    return { ok: true, json: async () => ({ data: { succeeded: 1 } }) };
+    return { ok: true, json: async () => ({ data: { succeeded: calls.length === 1 ? 2 : 1 } }) };
   };
   try {
     const form = new FormData();
