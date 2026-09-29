@@ -1,4 +1,5 @@
 const SALES_EMAIL = 'sales@helixlinear.com';
+const QUOTE_RECIPIENTS = [SALES_EMAIL, 'partsolutionshelix@robot.zapier.com'];
 const MAX_DRAWING_BYTES = 3 * 1024 * 1024;
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const labels = {
@@ -34,7 +35,7 @@ async function sendEmail(key, to, subject, html, attachments = [], replyTo = SAL
   const response = await fetch('https://api.smtp2go.com/v3/email/send', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Smtp2go-Api-Key': key },
-    body: JSON.stringify({ api_key: key, to: [to], sender: `Roller Screw Configurator <${SALES_EMAIL}>`, subject, html_body: html, custom_headers: [{ header: 'Reply-To', value: replyTo }], ...(attachments.length ? { attachments } : {}) }),
+    body: JSON.stringify({ api_key: key, to: Array.isArray(to) ? to : [to], sender: `Roller Screw Configurator <${SALES_EMAIL}>`, subject, html_body: html, custom_headers: [{ header: 'Reply-To', value: replyTo }], ...(attachments.length ? { attachments } : {}) }),
   });
   const result = await response.json();
   if (!response.ok || result?.data?.succeeded !== 1) throw new Error('SMTP2GO send failed');
@@ -69,7 +70,7 @@ export default async function handler(request, response) {
       attachments.push({ filename: 'customer-drawing.pdf', fileblob: bytes.toString('base64'), mimetype: 'application/pdf' });
     }
     const details = `<table style="border-collapse:collapse;width:100%;font-family:sans-serif">${[['Company Name', companyName], ['Your Name', yourName], ['Your Email', yourEmail], ['Part Number', partNumber]].map(([label, value]) => `<tr><td style="padding:8px 12px;font-weight:bold;background:#f1f5f9">${label}</td><td style="padding:8px 12px">${escapeHtml(value)}</td></tr>`).join('')}</table>`;
-    await sendEmail(process.env.SMTP2GO_API_KEY, SALES_EMAIL, `Quote Request from ${companyName} — ${partNumber}`, `<h2>New Quote Request</h2>${details}${attachments.length ? '<p>Customer drawing attached as PDF.</p>' : ''}${selections(config)}`, attachments, yourEmail);
+    await sendEmail(process.env.SMTP2GO_API_KEY, QUOTE_RECIPIENTS, `Quote Request from ${companyName} — ${partNumber}`, `<h2>New Quote Request</h2>${details}${attachments.length ? '<p>Customer drawing attached as PDF.</p>' : ''}${selections(config)}`, attachments, yourEmail);
     try {
       await sendEmail(process.env.SMTP2GO_API_KEY, yourEmail, `Your Quote Request — ${partNumber}`, `<div style="font-family:sans-serif;color:#222"><h2 style="color:#003494">Thank you for your quote request, ${escapeHtml(yourName)}!</h2><p>We've received your request and our sales team will be in touch shortly.</p><h3>Your Configuration</h3>${details}${selections(config)}<p>If you have any questions, contact <a href="mailto:${SALES_EMAIL}">${SALES_EMAIL}</a>.</p></div>`);
     } catch (error) {

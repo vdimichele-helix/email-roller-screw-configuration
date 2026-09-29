@@ -28,7 +28,7 @@ test('submits sales email and customer confirmation with attached PDF', async ()
     await handler(req, res);
     assert.equal(res.code, 200);
     assert.equal(calls.length, 2);
-    assert.deepEqual(calls.map((call) => call.to[0]), ['sales@helixlinear.com', 'customer@example.com']);
+    assert.deepEqual(calls.map((call) => call.to), [['sales@helixlinear.com', 'partsolutionshelix@robot.zapier.com'], ['customer@example.com']]);
     assert.match(calls[0].html_body, /SRS-123/);
     assert.match(calls[0].html_body, /Standard Roller Screw/);
     assert.match(calls[0].html_body, /Example &lt;Company&gt;/);
