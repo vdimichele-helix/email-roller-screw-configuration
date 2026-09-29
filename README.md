@@ -38,4 +38,3 @@ Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.
 
 Support: [https://app.base44.com/support](https://app.base44.com/support)
 
-Roller Screw Configurator
