@@ -1,0 +1,26 @@
+{
+  "name": "Configuration",
+  "type": "object",
+  "properties": {
+    "account_name": {
+      "type": "string",
+      "description": "Customer account name"
+    },
+    "salesperson": {
+      "type": "string",
+      "description": "Salesperson name"
+    },
+    "part_number": {
+      "type": "string",
+      "description": "Generated part number"
+    },
+    "config_data": {
+      "type": "object",
+      "description": "Full configuration selections"
+    }
+  },
+  "required": [
+    "account_name",
+    "part_number"
+  ]
+}
